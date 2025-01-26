@@ -6,8 +6,7 @@ import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Builder;
 import lombok.Data;
 
-import javax.persistence.*;
-import java.util.Date;
+import java.time.LocalDateTime;
 
 @Data
 @TableName("user")
@@ -21,17 +20,17 @@ public class User {
     private String email;        // 邮箱
     private String password;     // 密码
     private Integer status;      // 用户状态
-    private Date createTime;     // 创建时间
+    private LocalDateTime createTime;     // 创建时间
     private Integer gender;      // 性别
     private Integer age;         // 年龄
     private String birth;        // 生日
     private String avatarUrl;    // 头像路径
-    private Date updateTime;
+    private LocalDateTime updateTime;
 
     public User() {
     }
 
-    public User(String userId, String userName, String phoneNum, String email, String password, Integer status, Date createTime, Integer gender, Integer age,String birth,String avatarUrl, Date updateTime) {
+    public User(String userId, String userName, String phoneNum, String email, String password, Integer status, LocalDateTime createTime, Integer gender, Integer age,String birth,String avatarUrl, LocalDateTime updateTime) {
         this.userId = userId;
         this.userName = userName;
         this.phoneNum = phoneNum;

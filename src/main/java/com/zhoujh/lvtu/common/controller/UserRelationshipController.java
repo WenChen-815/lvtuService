@@ -1,12 +1,18 @@
 package com.zhoujh.lvtu.common.controller;
 
+import com.zhoujh.lvtu.common.model.User;
+import com.zhoujh.lvtu.common.model.UserInfo;
+import com.zhoujh.lvtu.common.model.UserRelationship;
 import com.zhoujh.lvtu.common.service.UserRelationshipService;
+import com.zhoujh.lvtu.common.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/relationship")
 public class UserRelationshipController {
+    @Autowired
+    private UserService userService;
 
     @Autowired
     private UserRelationshipService userRelationshipService;
@@ -38,5 +44,22 @@ public class UserRelationshipController {
                                      @RequestParam String relatedUserId,
                                      @RequestParam Integer relationshipType) {
         return userRelationshipService.updateRelationship(userId, relatedUserId, relationshipType);
+    }
+
+
+    @GetMapping("/getCreatorInfo")
+    public UserInfo getCreatorInfo(@RequestParam String userId, @RequestParam String creatorId) {
+        User user = userService.getById(userId);
+        UserRelationship userRelationship = userRelationshipService.findRelationship(userId, creatorId);
+        return new UserInfo(
+                user.getUserId(),
+                user.getUserName(),
+                user.getStatus(),
+                user.getGender(),
+                user.getAge(),
+                user.getBirth(),
+                user.getAvatarUrl(),
+                userRelationship==null?0:userRelationship.getRelationshipType()
+        );
     }
 }

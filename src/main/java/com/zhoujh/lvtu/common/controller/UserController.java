@@ -1,6 +1,5 @@
 package com.zhoujh.lvtu.common.controller;
 
-import cn.hutool.core.lang.copier.SrcToDestCopier;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.zhoujh.lvtu.common.model.User;
 import com.zhoujh.lvtu.common.model.UserInfo;
@@ -14,6 +13,11 @@ import org.springframework.web.multipart.MultipartFile;
 public class UserController {
     @Autowired
     private UserService userService;
+
+    @GetMapping("/user")
+    public User getUser(@RequestParam String userId) {
+        return userService.getById(userId);
+    }
 
     // 用户登录注册接口
     @PostMapping("/registerAndLogin")
@@ -38,13 +42,13 @@ public class UserController {
     }
 
     @PostMapping("/update")
-    public String updateUserInfo(@RequestParam(value = "file", required = false) MultipartFile file,
+    public User updateUserInfo(@RequestParam(value = "file", required = false) MultipartFile file,
                                  @RequestParam String userName,
                                  @RequestParam String userId,
                                  @RequestParam Integer gender,
                                  @RequestParam String email,
                                  @RequestParam String birth) {
-        boolean result = userService.updateUserInfo(file, userName, userId, gender, email, birth);
-        return result ? "用户信息更新成功" : "用户信息更新失败";
+        User updateUser = userService.updateUserInfo(file, userName, userId, gender, email, birth);
+        return updateUser;
     }
 }

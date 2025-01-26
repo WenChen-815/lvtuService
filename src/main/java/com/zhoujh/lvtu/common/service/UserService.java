@@ -16,6 +16,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.io.IOException;
+import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
@@ -47,7 +48,8 @@ public class UserService extends ServiceImpl<UserMapper, User>
         user.setUserName("用户_" + System.currentTimeMillis());
         user.setPassword(user.getPassword());
         user.setUserId(java.util.UUID.randomUUID().toString());
-        user.setCreateTime(new Date());
+        user.setGender(0);
+        user.setCreateTime(LocalDateTime.now());
         user.setStatus(1); // 默认状态为正常
         userMapper.insert(user);// 插入数据库
         return user;
@@ -106,7 +108,7 @@ public class UserService extends ServiceImpl<UserMapper, User>
     }
 
     @Override
-    public boolean updateUserInfo(MultipartFile file, String userName, String userId, Integer gender, String email, String birth) {
+    public User updateUserInfo(MultipartFile file, String userName, String userId, Integer gender, String email, String birth) {
         // 校验用户是否存在
         User user = this.getById(userId);
         if (user == null) {
@@ -139,6 +141,6 @@ public class UserService extends ServiceImpl<UserMapper, User>
                 .set(User::getEmail, email)
                 .set(User::getBirth, birth)
                 .set(User::getAvatarUrl, avatarUrl);
-        return this.update(updateWrapper);
+        return this.update(updateWrapper) ? this.getById(userId): null;
     }
 }

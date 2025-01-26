@@ -1,4 +1,4 @@
-package com.zhoujh.lvtu.config;
+package com.zhoujh.lvtu.utils;
 
 import com.google.gson.Gson;
 import com.zhoujh.lvtu.common.model.LocationMessage;

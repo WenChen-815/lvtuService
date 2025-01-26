@@ -34,5 +34,5 @@ public interface UserRepository extends IService<User> {
      * @param birth 生日
      * @return 是否更新成功
      */
-    boolean updateUserInfo(MultipartFile file, String userName, String userId, Integer gender, String email, String birth);
+    User updateUserInfo(MultipartFile file, String userName, String userId, Integer gender, String email, String birth);
 }
