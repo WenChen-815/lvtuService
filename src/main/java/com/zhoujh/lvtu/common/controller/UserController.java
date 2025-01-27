@@ -3,7 +3,7 @@ package com.zhoujh.lvtu.common.controller;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.zhoujh.lvtu.common.model.User;
 import com.zhoujh.lvtu.common.model.UserInfo;
-import com.zhoujh.lvtu.common.service.UserService;
+import com.zhoujh.lvtu.common.serviceImpl.UserServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -12,17 +12,17 @@ import org.springframework.web.multipart.MultipartFile;
 @RequestMapping("/user")
 public class UserController {
     @Autowired
-    private UserService userService;
+    private UserServiceImpl userServiceImpl;
 
     @GetMapping("/user")
     public User getUser(@RequestParam String userId) {
-        return userService.getById(userId);
+        return userServiceImpl.getById(userId);
     }
 
     // 用户登录注册接口
     @PostMapping("/registerAndLogin")
     public User register(@RequestBody User user) { //用RequestBody注解将JSON自动转为User对象
-        User user1 = userService.registerAndLogin(user);
+        User user1 = userServiceImpl.registerAndLogin(user);
         return user1;
     }
 
@@ -38,7 +38,7 @@ public class UserController {
                                                 @RequestParam String userNameStr,
                                                 @RequestParam(defaultValue = "1") int pageNum,
                                                 @RequestParam(defaultValue = "10") int pageSize) {
-        return userService.searchUsersByUserName(userId, userNameStr, pageNum, pageSize);
+        return userServiceImpl.searchUsersByUserName(userId, userNameStr, pageNum, pageSize);
     }
 
     @PostMapping("/update")
@@ -48,7 +48,7 @@ public class UserController {
                                  @RequestParam Integer gender,
                                  @RequestParam String email,
                                  @RequestParam String birth) {
-        User updateUser = userService.updateUserInfo(file, userName, userId, gender, email, birth);
+        User updateUser = userServiceImpl.updateUserInfo(file, userName, userId, gender, email, birth);
         return updateUser;
     }
 }

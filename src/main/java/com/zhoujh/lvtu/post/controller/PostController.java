@@ -1,7 +1,8 @@
 package com.zhoujh.lvtu.post.controller;
 
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.zhoujh.lvtu.post.model.Post;
-import com.zhoujh.lvtu.post.service.PostService;
+import com.zhoujh.lvtu.post.serviceImpl.PostServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.FileCopyUtils;
 import org.springframework.web.bind.annotation.*;
@@ -21,9 +22,15 @@ import java.util.List;
 @RequestMapping("/post")
 public class PostController {
     @Autowired
-    private PostService postService;
+    private PostServiceImpl postServiceImpl;
 
     private final String uploadDirectory = "D:/lvtu/post/";
+
+    @GetMapping("/getAllPosts")
+    public Page<Post> getAllPosts(@RequestParam(defaultValue = "1") int pageNum,
+                                  @RequestParam(defaultValue = "10") int pageSize) {
+        return postServiceImpl.getAllPosts(pageNum, pageSize);
+    }
 
     @PostMapping("/upload")
     public Post uploadPost(
@@ -83,6 +90,6 @@ public class PostController {
             }
             post.setPicturePath(fileNames);
         }
-        return postService.createPost(post);
+        return postServiceImpl.createPost(post);
     }
 }

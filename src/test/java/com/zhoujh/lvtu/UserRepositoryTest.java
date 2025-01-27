@@ -1,18 +1,14 @@
 package com.zhoujh.lvtu;
 
-import com.zhoujh.lvtu.common.model.User;
-import com.zhoujh.lvtu.common.repository.UserRepository;
-import org.junit.jupiter.api.Test;
+import com.zhoujh.lvtu.common.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-
-import java.util.List;
 
 @SpringBootTest
 public class UserRepositoryTest {
 
     @Autowired
-    private UserRepository userRepository;
+    private UserService userService;
 //    @Test
 //    // 测试新增
 //    public void testSave() {

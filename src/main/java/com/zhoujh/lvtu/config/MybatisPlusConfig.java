@@ -3,8 +3,13 @@ package com.zhoujh.lvtu.config;
 import com.baomidou.mybatisplus.annotation.DbType;
 import com.baomidou.mybatisplus.extension.plugins.MybatisPlusInterceptor;
 import com.baomidou.mybatisplus.extension.plugins.inner.PaginationInnerInterceptor;
+import com.zhoujh.lvtu.utils.ListTypeHandler;
+import com.zhoujh.lvtu.utils.StringListHandler;
+import org.apache.ibatis.type.TypeHandler;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+
+import java.util.List;
 
 @Configuration
 public class MybatisPlusConfig {
@@ -23,5 +28,10 @@ public class MybatisPlusConfig {
         mybatisPlusInterceptor.addInnerInterceptor(paginationInnerInterceptor);
 
         return mybatisPlusInterceptor;
+    }
+
+    @Bean
+    public StringListHandler stringListHandler() {
+        return new StringListHandler();
     }
 }

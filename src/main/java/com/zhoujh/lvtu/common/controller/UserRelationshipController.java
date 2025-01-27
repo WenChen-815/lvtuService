@@ -3,8 +3,8 @@ package com.zhoujh.lvtu.common.controller;
 import com.zhoujh.lvtu.common.model.User;
 import com.zhoujh.lvtu.common.model.UserInfo;
 import com.zhoujh.lvtu.common.model.UserRelationship;
-import com.zhoujh.lvtu.common.service.UserRelationshipService;
-import com.zhoujh.lvtu.common.service.UserService;
+import com.zhoujh.lvtu.common.serviceImpl.UserRelationshipServiceImpl;
+import com.zhoujh.lvtu.common.serviceImpl.UserServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -12,10 +12,10 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/relationship")
 public class UserRelationshipController {
     @Autowired
-    private UserService userService;
+    private UserServiceImpl userServiceImpl;
 
     @Autowired
-    private UserRelationshipService userRelationshipService;
+    private UserRelationshipServiceImpl userRelationshipServiceImpl;
 
     /**
      * 添加关系
@@ -28,7 +28,7 @@ public class UserRelationshipController {
     public String addRelationship(@RequestParam String userId,
                                   @RequestParam String relatedUserId,
                                   @RequestParam Integer relationshipType) {
-        boolean result = userRelationshipService.addRelationship(userId, relatedUserId, relationshipType);
+        boolean result = userRelationshipServiceImpl.addRelationship(userId, relatedUserId, relationshipType);
         return result ? "添加关系成功" : "添加关系失败";
     }
 
@@ -43,14 +43,14 @@ public class UserRelationshipController {
     public int updateRelationship(@RequestParam String userId,
                                      @RequestParam String relatedUserId,
                                      @RequestParam Integer relationshipType) {
-        return userRelationshipService.updateRelationship(userId, relatedUserId, relationshipType);
+        return userRelationshipServiceImpl.updateRelationship(userId, relatedUserId, relationshipType);
     }
 
 
     @GetMapping("/getCreatorInfo")
     public UserInfo getCreatorInfo(@RequestParam String userId, @RequestParam String creatorId) {
-        User user = userService.getById(userId);
-        UserRelationship userRelationship = userRelationshipService.findRelationship(userId, creatorId);
+        User user = userServiceImpl.getById(userId);
+        UserRelationship userRelationship = userRelationshipServiceImpl.findRelationship(userId, creatorId);
         return new UserInfo(
                 user.getUserId(),
                 user.getUserName(),
