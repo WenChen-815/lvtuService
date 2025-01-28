@@ -24,8 +24,7 @@ public class CommentServiceImpl extends ServiceImpl<CommentMapper, Comment> impl
     @Override
     public Comment addComment(Comment comment) {
         comment.setId(UUID.randomUUID().toString());
-        commentMapper.insert(comment);
-        return comment;
+        return commentMapper.insert(comment) > 0 ? comment: null;
     }
 }
 

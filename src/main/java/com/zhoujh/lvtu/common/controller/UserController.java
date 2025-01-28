@@ -19,6 +19,12 @@ public class UserController {
         return userServiceImpl.getById(userId);
     }
 
+    @GetMapping("getUserAvatarById")
+    public String getUserAvatarById(@RequestParam String userId) {
+        User user = userServiceImpl.getById(userId);
+        return user.getAvatarUrl();
+    }
+
     // 用户登录注册接口
     @PostMapping("/registerAndLogin")
     public User register(@RequestBody User user) { //用RequestBody注解将JSON自动转为User对象

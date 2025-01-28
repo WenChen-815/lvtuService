@@ -23,8 +23,8 @@ public class CommentController {
     }
 
     @PostMapping("addComment")
-    public ResponseEntity<Comment> addComment(@RequestBody Comment comment) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(commentServiceImpl.addComment(comment));
+    public Comment addComment(@RequestBody Comment comment) {
+        return commentServiceImpl.addComment(comment);
     }
 }
 
