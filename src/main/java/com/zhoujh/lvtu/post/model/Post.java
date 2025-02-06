@@ -3,8 +3,6 @@ package com.zhoujh.lvtu.post.model;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
-import com.zhoujh.lvtu.config.MybatisPlusConfig;
-import com.zhoujh.lvtu.utils.ListTypeHandler;
 import com.zhoujh.lvtu.utils.StringListHandler;
 import lombok.Data;
 

@@ -49,7 +49,7 @@ public class UserRelationshipController {
 
     @GetMapping("/getCreatorInfo")
     public UserInfo getCreatorInfo(@RequestParam String userId, @RequestParam String creatorId) {
-        User user = userServiceImpl.getById(userId);
+        User user = userServiceImpl.getById(creatorId);
         UserRelationship userRelationship = userRelationshipServiceImpl.findRelationship(userId, creatorId);
         return new UserInfo(
                 user.getUserId(),

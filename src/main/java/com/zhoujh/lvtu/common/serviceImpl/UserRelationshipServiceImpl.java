@@ -62,7 +62,7 @@ public class UserRelationshipServiceImpl extends ServiceImpl<UserRelationshipMap
                 if (existingRelationship1 != null && existingRelationship1.getRelationshipType() == this.FOLLOWED) {
                     existingRelationship1.setRelationshipType(this.FOLLOW_EACH_OTHER);
                     this.updateById(existingRelationship1);
-                    return this.addRelationship(userId, relatedUserId, newRelationshipType) ? this.FOLLOW_EACH_OTHER: -1;
+                    return this.addRelationship(userId, relatedUserId, this.FOLLOW_EACH_OTHER) ? this.FOLLOW_EACH_OTHER: -1;
                 } else { // 用户未关注对方，对方也未关注用户，则添加关系
                     return this.addRelationship(userId, relatedUserId, newRelationshipType) ? this.FOLLOWED: -1;
                 }
