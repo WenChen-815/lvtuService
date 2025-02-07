@@ -99,11 +99,15 @@ public class TravelPlanController {
     // 分页查询
     @GetMapping("/getPlans")
     public Page<TravelPlan> getPlans(
-            @RequestParam(defaultValue = "1") int page,
-            @RequestParam(defaultValue = "10") int size
+            @RequestParam(defaultValue = "1") int pageNum,
+            @RequestParam(defaultValue = "10") int pageSize
     ) {
-        return travelPlanServiceImpl.page(new Page<>(page, size));
+        return travelPlanServiceImpl.getAllPlans(pageNum, pageSize);
     }
 
+    @GetMapping("/getPlanById")
+    public TravelPlan getPlanById(@RequestParam String travelPlanId) {
+        return travelPlanServiceImpl.getById(travelPlanId);
+    }
 
 }
