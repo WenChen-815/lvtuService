@@ -35,4 +35,6 @@ public interface UserService extends IService<User> {
      * @return 是否更新成功
      */
     User updateUserInfo(MultipartFile file, String userName, String userId, Integer gender, String email, String birth);
+
+    User getUserById(String userId);
 }

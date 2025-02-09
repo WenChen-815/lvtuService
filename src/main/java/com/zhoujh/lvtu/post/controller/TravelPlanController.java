@@ -1,10 +1,17 @@
 package com.zhoujh.lvtu.post.controller;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.zhoujh.lvtu.common.controller.HmsPushTokenController;
 import com.zhoujh.lvtu.common.model.User;
+import com.zhoujh.lvtu.common.model.UserInfo;
+import com.zhoujh.lvtu.common.serviceImpl.HmsPushTokenServiceImpl;
+import com.zhoujh.lvtu.common.serviceImpl.UserServiceImpl;
+import com.zhoujh.lvtu.post.model.PlanParticipant;
 import com.zhoujh.lvtu.post.model.TravelPlan;
 import com.zhoujh.lvtu.post.service.TravelPlanService;
+import com.zhoujh.lvtu.post.serviceImpl.PlanParticipantServiceImpl;
 import com.zhoujh.lvtu.post.serviceImpl.TravelPlanServiceImpl;
+import com.zhoujh.lvtu.utils.HuaweiPushService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.*;
@@ -14,6 +21,8 @@ import java.io.File;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Locale;
 import java.util.UUID;
 
@@ -23,6 +32,14 @@ public class TravelPlanController {
 
     @Autowired
     private TravelPlanServiceImpl travelPlanServiceImpl;
+    @Autowired
+    private PlanParticipantServiceImpl planParticipantServiceImpl;
+    @Autowired
+    private UserServiceImpl userServiceImpl;
+    @Autowired
+    private HmsPushTokenServiceImpl hmsPushTokenServiceImpl;
+    @Autowired
+    private HuaweiPushService huaweiPushService;
     @Value("${spring.resources.static-locations}")
     private String staticPath;
 
@@ -110,4 +127,89 @@ public class TravelPlanController {
         return travelPlanServiceImpl.getById(travelPlanId);
     }
 
+    @PostMapping("/addParticipants")
+    public String addParticipants(@RequestParam String travelPlanId, @RequestParam String userId, @RequestParam String creatorId) {
+        TravelPlan travelPlan = travelPlanServiceImpl.getById(travelPlanId);
+        if (travelPlan == null) {
+            return "fail";
+        }
+        travelPlan.setCurrentParticipants(travelPlan.getCurrentParticipants() + 1);
+        PlanParticipant participant = new PlanParticipant();
+        participant.setPlanId(travelPlanId);
+        participant.setUserId(userId);
+        boolean isSuccess1 = planParticipantServiceImpl.addParticipant(participant);
+        boolean isSuccess2 = travelPlanServiceImpl.updateById(travelPlan);
+
+        // 通知创建者
+        List<String> tokens = hmsPushTokenServiceImpl.getTokensByUserId(creatorId);
+        StringBuilder sb = new StringBuilder();
+        for(int i = 0, len = tokens.size(); i < len; i++){
+            if(i == len - 1){
+                sb.append("\"").append(tokens.get(i)).append("\"");
+            }else{
+                sb.append("\"").append(tokens.get(i)).append("\",");
+            }
+        }
+        String json = "{\n" +
+                "    \"validate_only\": false,\n" +
+                "    \"message\": {\n" +
+                "        \"data\": \"{'title':'旅兔通知','body':'有旅友参加了你的旅行计划，请及时联系哦~','travelPlanId':'"+travelPlan.getTravelPlanId()+"'}\",\n" +
+                "        \"token\": ["+ sb +"]\n" +
+                "    }\n" +
+                "}";
+        System.out.println(json);
+        try {
+            huaweiPushService.sendPushMessage(json);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        if (isSuccess1 && isSuccess2){
+            return "success";
+        } else {
+            return "fail";
+        }
+    }
+
+    @GetMapping("/isParticipant")
+    public boolean isParticipants(@RequestParam String travelPlanId, @RequestParam String userId) {
+        PlanParticipant participant = planParticipantServiceImpl.findByPlanIdAndUserId(travelPlanId, userId);
+        return participant != null;
+    }
+
+    @PostMapping("/finishPlan")
+    public String finishPlan(@RequestParam String travelPlanId) {
+        TravelPlan travelPlan = travelPlanServiceImpl.getById(travelPlanId);
+        if (travelPlan == null) {
+            return "fail";
+        }
+        travelPlan.setStatus(3);
+        boolean isSuccess = travelPlanServiceImpl.updateById(travelPlan);
+        return isSuccess ? "success" : "fail";
+    }
+    @PostMapping("/exitPlan")
+    public String exitPlan(@RequestParam String travelPlanId, @RequestParam String userId) {
+        TravelPlan travelPlan = travelPlanServiceImpl.getById(travelPlanId);
+        if (travelPlan == null) {
+            return "fail";
+        }
+        travelPlan.setCurrentParticipants(travelPlan.getCurrentParticipants() - 1);
+        boolean isSuccess1 = planParticipantServiceImpl.deleteByPlanIdAndUserId(travelPlanId, userId);
+        boolean isSuccess2 =travelPlanServiceImpl.updateById(travelPlan);
+        if (isSuccess1 && isSuccess2){
+            return "success";
+        } else {
+            return "fail";
+        }
+    }
+    @GetMapping("/getParticipants")
+    public List<UserInfo> getParticipants(@RequestParam String travelPlanId) {
+        List<PlanParticipant> participants = planParticipantServiceImpl.getParticipants(travelPlanId);
+        List<UserInfo> userInfos = new ArrayList<>();
+        for(PlanParticipant participant : participants){
+            User user = userServiceImpl.getUserById(participant.getUserId());
+            UserInfo userInfo = new UserInfo(user.getUserId(), user.getUserName(), user.getStatus(), user.getGender(), user.getAge(), user.getBirth(), user.getAvatarUrl(), 0);
+            userInfos.add(userInfo);
+        }
+        return userInfos;
+    }
 }

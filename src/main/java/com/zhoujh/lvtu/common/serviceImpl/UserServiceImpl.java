@@ -141,4 +141,9 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
                 .set(User::getAvatarUrl, avatarUrl);
         return this.update(updateWrapper) ? this.getById(userId): null;
     }
+
+    @Override
+    public User getUserById(String userId) {
+        return this.getById(userId);
+    }
 }

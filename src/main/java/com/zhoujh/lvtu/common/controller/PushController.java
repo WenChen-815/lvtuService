@@ -15,10 +15,9 @@ public class PushController {
     private HuaweiPushService huaweiPushService;
 
     @GetMapping("/sendPush")
-    public String sendPush(@RequestParam String deviceToken, @RequestParam String message) {
+    public String sendPush(@RequestParam String deviceToken, @RequestParam String title, @RequestParam String message) {
         try {
-            String accessToken = huaweiPushService.getAccessToken();
-            huaweiPushService.sendPushMessage(accessToken, deviceToken, message);
+            huaweiPushService.sendPushMessage1(deviceToken, title, message);
             return "Push message sent successfully!";
         } catch (IOException e) {
             e.printStackTrace();
