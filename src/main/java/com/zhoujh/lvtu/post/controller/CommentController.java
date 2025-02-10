@@ -22,7 +22,7 @@ public class CommentController {
         return ResponseEntity.ok(commentServiceImpl.getCommentsByPostId(postId));
     }
 
-    @PostMapping("addComment")
+    @PostMapping("/addComment")
     public Comment addComment(@RequestBody Comment comment) {
         return commentServiceImpl.addComment(comment);
     }

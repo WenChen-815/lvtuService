@@ -32,6 +32,11 @@ public class PostController {
         return postServiceImpl.getAllPosts(pageNum, pageSize);
     }
 
+    @GetMapping("/getPostsByUserId")
+    public List<Post> getPostsByUserId(@RequestParam String userId) {
+        return postServiceImpl.getPostsByUserId(userId);
+    }
+
     @PostMapping("/upload")
     public Post uploadPost(
             @RequestPart("post")Post post,

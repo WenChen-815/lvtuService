@@ -8,6 +8,8 @@ import com.zhoujh.lvtu.post.mapper.TravelPlanMapper;
 import com.zhoujh.lvtu.post.service.TravelPlanService;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 public class TravelPlanServiceImpl extends ServiceImpl<TravelPlanMapper, TravelPlan> implements TravelPlanService {
     @Override
@@ -21,6 +23,11 @@ public class TravelPlanServiceImpl extends ServiceImpl<TravelPlanMapper, TravelP
         LambdaQueryWrapper<TravelPlan> queryWrapper = new LambdaQueryWrapper<>();
         queryWrapper.orderByDesc(TravelPlan::getUpdateTime);
         return this.page(page, queryWrapper);
+    }
+
+    @Override
+    public List<TravelPlan> getPlansByUserId(String userId) {
+        return this.list(new LambdaQueryWrapper<TravelPlan>().eq(TravelPlan::getUserId, userId));
     }
 
 }

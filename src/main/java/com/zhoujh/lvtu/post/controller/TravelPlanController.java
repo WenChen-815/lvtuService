@@ -1,14 +1,12 @@
 package com.zhoujh.lvtu.post.controller;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.zhoujh.lvtu.common.controller.HmsPushTokenController;
 import com.zhoujh.lvtu.common.model.User;
 import com.zhoujh.lvtu.common.model.UserInfo;
 import com.zhoujh.lvtu.common.serviceImpl.HmsPushTokenServiceImpl;
 import com.zhoujh.lvtu.common.serviceImpl.UserServiceImpl;
 import com.zhoujh.lvtu.post.model.PlanParticipant;
 import com.zhoujh.lvtu.post.model.TravelPlan;
-import com.zhoujh.lvtu.post.service.TravelPlanService;
 import com.zhoujh.lvtu.post.serviceImpl.PlanParticipantServiceImpl;
 import com.zhoujh.lvtu.post.serviceImpl.TravelPlanServiceImpl;
 import com.zhoujh.lvtu.utils.HuaweiPushService;
@@ -127,6 +125,11 @@ public class TravelPlanController {
         return travelPlanServiceImpl.getById(travelPlanId);
     }
 
+    @GetMapping("/getPlansByUserId")
+    public List<TravelPlan> getPlansByUserId(@RequestParam String userId) {
+        return travelPlanServiceImpl.getPlansByUserId(userId);
+    }
+
     @PostMapping("/addParticipants")
     public String addParticipants(@RequestParam String travelPlanId, @RequestParam String userId, @RequestParam String creatorId) {
         TravelPlan travelPlan = travelPlanServiceImpl.getById(travelPlanId);
@@ -141,20 +144,16 @@ public class TravelPlanController {
         boolean isSuccess2 = travelPlanServiceImpl.updateById(travelPlan);
 
         // 通知创建者
-        List<String> tokens = hmsPushTokenServiceImpl.getTokensByUserId(creatorId);
-        StringBuilder sb = new StringBuilder();
-        for(int i = 0, len = tokens.size(); i < len; i++){
-            if(i == len - 1){
-                sb.append("\"").append(tokens.get(i)).append("\"");
-            }else{
-                sb.append("\"").append(tokens.get(i)).append("\",");
-            }
-        }
+        String tokens = hmsPushTokenServiceImpl.createTokens(creatorId);
         String json = "{\n" +
                 "    \"validate_only\": false,\n" +
                 "    \"message\": {\n" +
-                "        \"data\": \"{'title':'旅兔通知','body':'有旅友参加了你的旅行计划，请及时联系哦~','travelPlanId':'"+travelPlan.getTravelPlanId()+"'}\",\n" +
-                "        \"token\": ["+ sb +"]\n" +
+                "        \"data\": \"{'title':'旅兔通知'," +
+                "'body':'有旅友参加了你的旅行计划，请及时联系哦~'," +
+                "'messageTag':'joinPlan'," +
+                "'travelPlanId':'"+travelPlan.getTravelPlanId()+"'," +
+                "'tagUserId':'"+ creatorId +"'}\",\n" +
+                "        \"token\": ["+ tokens +"]\n" +
                 "    }\n" +
                 "}";
         System.out.println(json);

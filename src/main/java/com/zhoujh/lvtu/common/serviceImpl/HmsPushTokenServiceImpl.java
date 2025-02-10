@@ -52,4 +52,18 @@ public class HmsPushTokenServiceImpl
                 .eq(HmsPushToken::getHmsToken, hmsToken);
         return this.remove(wrapper);
     }
+
+
+    public String createTokens(String userId){
+        List<String> tokens = getTokensByUserId(userId);
+        StringBuilder sb = new StringBuilder();
+        for(int i = 0, len = tokens.size(); i < len; i++){
+            if(i == len - 1){
+                sb.append("\"").append(tokens.get(i)).append("\"");
+            }else{
+                sb.append("\"").append(tokens.get(i)).append("\",");
+            }
+        }
+        return sb.toString();
+    }
 }

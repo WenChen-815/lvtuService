@@ -11,4 +11,6 @@ public interface UserMapper extends BaseMapper<User> {
     User findByPhoneNum(String phoneNum); // 根据手机号查找用户
     @Select("SELECT * FROM user WHERE email = #{email}")
     User findByEmail(String email); // 根据邮箱查找用户
+    @Select("SELECT * FROM user WHERE user_id = #{userId}")
+    User getUserById(String relatedUserId);
 }

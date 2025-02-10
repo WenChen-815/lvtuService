@@ -9,6 +9,7 @@ import com.zhoujh.lvtu.post.service.PostService;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -57,5 +58,10 @@ public class PostServiceImpl extends ServiceImpl<PostMapper, Post> implements Po
             return updateById(post); // 更新数据库
         }
         return false;
+    }
+
+    @Override
+    public List<Post> getPostsByUserId(String userId) {
+        return baseMapper.selectList(new LambdaQueryWrapper<Post>().eq(Post::getUserId, userId));
     }
 }
