@@ -3,6 +3,7 @@ package com.zhoujh.lvtu.post.serviceImpl;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.zhoujh.lvtu.common.model.UserRelationship;
 import com.zhoujh.lvtu.post.mapper.PostMapper;
 import com.zhoujh.lvtu.post.model.Post;
 import com.zhoujh.lvtu.post.service.PostService;
@@ -41,6 +42,18 @@ public class PostServiceImpl extends ServiceImpl<PostMapper, Post> implements Po
         queryWrapper.orderByDesc(Post::getCreateTime); // 按创建时间倒序排序
         // 执行分页查询
         return this.page(page, queryWrapper);
+    }
+
+    @Override
+    public Page<Post> getFollowPosts(int pageNum, int pageSize, List<UserRelationship> userRelationships) {
+        Page<Post> page = new Page<>(pageNum, pageSize);
+        for (UserRelationship userRelationship : userRelationships) {
+            LambdaQueryWrapper<Post> queryWrapper = new LambdaQueryWrapper<>();
+            queryWrapper.eq(Post::getUserId, userRelationship.getRelatedUserId());
+            queryWrapper.orderByDesc(Post::getCreateTime); // 按创建时间倒序排序
+            this.page(page, queryWrapper);
+        }
+        return page;
     }
 
     @Override

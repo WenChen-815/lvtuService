@@ -1,6 +1,8 @@
 package com.zhoujh.lvtu.post.controller;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.zhoujh.lvtu.common.model.UserRelationship;
+import com.zhoujh.lvtu.common.serviceImpl.UserRelationshipServiceImpl;
 import com.zhoujh.lvtu.post.model.Post;
 import com.zhoujh.lvtu.post.serviceImpl.PostServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,6 +25,8 @@ import java.util.List;
 public class PostController {
     @Autowired
     private PostServiceImpl postServiceImpl;
+    @Autowired
+    private UserRelationshipServiceImpl userRelationshipServiceImpl;
 
     private final String uploadDirectory = "D:/lvtu/post/";
 
@@ -30,6 +34,13 @@ public class PostController {
     public Page<Post> getAllPosts(@RequestParam(defaultValue = "1") int pageNum,
                                   @RequestParam(defaultValue = "10") int pageSize) {
         return postServiceImpl.getAllPosts(pageNum, pageSize);
+    }
+    @GetMapping("/getFollowPosts")
+    public Page<Post> getFollowPosts(@RequestParam(defaultValue = "1") int pageNum,
+                                  @RequestParam(defaultValue = "10") int pageSize,
+                                     @RequestParam String userId) {
+        List<UserRelationship> userRelationships = userRelationshipServiceImpl.getFollowList(userId);
+        return postServiceImpl.getFollowPosts(pageNum, pageSize, userRelationships);
     }
 
     @GetMapping("/getPostsByUserId")

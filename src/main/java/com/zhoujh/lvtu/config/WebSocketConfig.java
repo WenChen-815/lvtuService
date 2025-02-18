@@ -1,6 +1,7 @@
 package com.zhoujh.lvtu.config;
 
 import com.zhoujh.lvtu.utils.LocationWebSocketHandler;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.socket.config.annotation.EnableWebSocket;
@@ -12,6 +13,8 @@ import org.springframework.web.socket.server.standard.ServletServerContainerFact
 @Configuration
 @EnableWebSocket
 public class WebSocketConfig implements WebSocketConfigurer{
+    @Autowired
+    private LocationWebSocketHandler locationWebSocketHandler;
     /**
      * 通信文本消息和二进制缓存区大小
      * 避免对接 第三方 报文过大时，Websocket 1009 错误
@@ -37,10 +40,12 @@ public class WebSocketConfig implements WebSocketConfigurer{
 
     @Override
     public void registerWebSocketHandlers(WebSocketHandlerRegistry webSocketHandlerRegistry) {
-        webSocketHandlerRegistry.addHandler(locationWebSocketHandler(), "/ws/location")
+//        webSocketHandlerRegistry.addHandler(locationWebSocketHandler(), "/ws/location")
+//                .setAllowedOrigins("*");
+        webSocketHandlerRegistry.addHandler(locationWebSocketHandler, "/ws/location")
                 .setAllowedOrigins("*");
     }
-    public LocationWebSocketHandler locationWebSocketHandler() {
-        return new LocationWebSocketHandler();
-    }
+//    public LocationWebSocketHandler locationWebSocketHandler() {
+//        return new LocationWebSocketHandler();
+//    }
 }

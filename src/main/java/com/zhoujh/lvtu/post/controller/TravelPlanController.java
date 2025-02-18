@@ -3,7 +3,9 @@ package com.zhoujh.lvtu.post.controller;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.zhoujh.lvtu.common.model.User;
 import com.zhoujh.lvtu.common.model.UserInfo;
+import com.zhoujh.lvtu.common.model.UserRelationship;
 import com.zhoujh.lvtu.common.serviceImpl.HmsPushTokenServiceImpl;
+import com.zhoujh.lvtu.common.serviceImpl.UserRelationshipServiceImpl;
 import com.zhoujh.lvtu.common.serviceImpl.UserServiceImpl;
 import com.zhoujh.lvtu.post.model.PlanParticipant;
 import com.zhoujh.lvtu.post.model.TravelPlan;
@@ -38,6 +40,8 @@ public class TravelPlanController {
     private HmsPushTokenServiceImpl hmsPushTokenServiceImpl;
     @Autowired
     private HuaweiPushService huaweiPushService;
+    @Autowired
+    private UserRelationshipServiceImpl userRelationshipServiceImpl;
     @Value("${spring.resources.static-locations}")
     private String staticPath;
 
@@ -118,6 +122,16 @@ public class TravelPlanController {
             @RequestParam(defaultValue = "10") int pageSize
     ) {
         return travelPlanServiceImpl.getAllPlans(pageNum, pageSize);
+    }
+
+    @GetMapping("/getFollowPlans")
+    public Page<TravelPlan> getFollowPlans(
+            @RequestParam(defaultValue = "1") int pageNum,
+            @RequestParam(defaultValue = "10") int pageSize,
+            @RequestParam String userId
+    ) {
+        List<UserRelationship> userRelationships = userRelationshipServiceImpl.getFollowList(userId);
+        return travelPlanServiceImpl.getFollowPlans(pageNum, pageSize, userRelationships);
     }
 
     @GetMapping("/getPlanById")

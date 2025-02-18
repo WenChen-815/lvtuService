@@ -4,6 +4,8 @@ import com.baomidou.mybatisplus.extension.service.IService;
 import com.zhoujh.lvtu.common.model.UserRelationship;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
+
 @Repository
 public interface UserRelationshipService extends IService<UserRelationship> {
     /**
@@ -25,5 +27,8 @@ public interface UserRelationshipService extends IService<UserRelationship> {
     int updateRelationship(String userId, String relatedUserId, Integer newRelationshipType);
 
     UserRelationship findRelationship(String userId, String relatedUserId);
+
+    // 获取用户关注列表
+    List<UserRelationship> getFollowList(String userId);
 
 }

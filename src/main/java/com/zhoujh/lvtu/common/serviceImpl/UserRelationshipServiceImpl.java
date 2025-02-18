@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 import java.io.IOException;
 import java.time.LocalDateTime;
 
+import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -115,4 +116,17 @@ public class UserRelationshipServiceImpl extends ServiceImpl<UserRelationshipMap
                 .eq(UserRelationship::getRelatedUserId, relatedUserId)
                 .one();
     }
+
+    @Override
+    public List<UserRelationship> getFollowList(String userId) {
+        return this.lambdaQuery()
+                .eq(UserRelationship::getUserId, userId)
+                .eq(UserRelationship::getRelationshipType, this.FOLLOWED)
+                .or()
+                .eq(UserRelationship::getUserId, userId)
+                .eq(UserRelationship::getRelationshipType, this.FOLLOW_EACH_OTHER)
+                .list();
+    }
+
+
 }
