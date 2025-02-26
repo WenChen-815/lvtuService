@@ -16,4 +16,7 @@ public interface UserConversationMapper extends BaseMapper<UserConversation> {
 
     @Select("SELECT * FROM user_conversation WHERE user_id = #{userId}")
     List<UserConversation> getByUserId(String userId);
+
+    @Select("SELECT * FROM user_conversation WHERE conversation_id = #{conversationId}")
+    List<UserConversation> getByConversationId(String conversationId);
 }

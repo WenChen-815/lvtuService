@@ -16,4 +16,8 @@ public interface TravelPlanService extends IService<TravelPlan> {
     Page<TravelPlan> getFollowPlans(int pageNum, int pageSize, List<UserRelationship> followList);
 
     List<TravelPlan> getPlansByUserId(String userId);
+
+    TravelPlan createPlanGroup(String travelPlanId, String userId);
+
+    Page<TravelPlan> getMyPlans(int pageNum, int pageSize, String userId);
 }

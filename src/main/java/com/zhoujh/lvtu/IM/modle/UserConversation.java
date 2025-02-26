@@ -22,6 +22,15 @@ public class UserConversation {
     private List<String> members;
     @TableField(exist = false)
     private List<UserInfo> userInfoList;
+    private String groupName;
+
+    public String getGroupName() {
+        return groupName;
+    }
+
+    public void setGroupName(String groupName) {
+        this.groupName = groupName;
+    }
 
     public Long getId() {
         return id;

@@ -19,4 +19,12 @@ public interface PostService extends IService<Post> {
     boolean deletePost(String postId);
 
     List<Post> getPostsByUserId(String userId);
+
+    void commentIncrease(String postId);
+
+    boolean likePost(String postId, String userId);
+
+    boolean unlikePost(String postId, String userId);
+
+    Page<Post> getMyPosts(int pageNum, int pageSize, String userId);
 }

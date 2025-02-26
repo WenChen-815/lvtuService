@@ -60,7 +60,7 @@ public class UserRelationshipServiceImpl extends ServiceImpl<UserRelationshipMap
                 // 取关 用户的关系为关注或互关
                 if (existingRelationship != null) {
                     // 互关状态 把对方的状态改为关注 用户的关系移除
-                    if(existingRelationship1 !=null && existingRelationship1.getRelationshipType() == this.FOLLOW_EACH_OTHER){
+                    if (existingRelationship1 != null && existingRelationship1.getRelationshipType() == this.FOLLOW_EACH_OTHER) {
                         existingRelationship1.setRelationshipType(this.FOLLOWED);
                         this.updateById(existingRelationship1);
                     }
@@ -77,18 +77,19 @@ public class UserRelationshipServiceImpl extends ServiceImpl<UserRelationshipMap
                     this.updateById(existingRelationship1);
 //                    return this.addRelationship(userId, relatedUserId, this.FOLLOW_EACH_OTHER) ? this.FOLLOW_EACH_OTHER: -1;
                     isSuccess = this.addRelationship(userId, relatedUserId, this.FOLLOW_EACH_OTHER);
-                    if(isSuccess) sendFollowPush(userId, relatedUserId);
-                    return isSuccess ? this.FOLLOW_EACH_OTHER: -1;
+                    if (isSuccess) sendFollowPush(userId, relatedUserId);
+                    return isSuccess ? this.FOLLOW_EACH_OTHER : -1;
                 } else { // 用户未关注对方，对方也未关注用户，则添加关系
 //                    return this.addRelationship(userId, relatedUserId, newRelationshipType) ? this.FOLLOWED: -1;
                     isSuccess = this.addRelationship(userId, relatedUserId, newRelationshipType);
-                    if(isSuccess) sendFollowPush(userId, relatedUserId);
-                    return isSuccess ? this.FOLLOWED: -1;
+                    if (isSuccess) sendFollowPush(userId, relatedUserId);
+                    return isSuccess ? this.FOLLOWED : -1;
                 }
             default:
                 return -1;
         }
     }
+
     // 发送关注推送
     public void sendFollowPush(String userId, String relatedUserId) {
         User user = userMapper.getUserById(userId);
@@ -98,8 +99,8 @@ public class UserRelationshipServiceImpl extends ServiceImpl<UserRelationshipMap
         String json = "{\n" +
                 "    \"validate_only\": false,\n" +
                 "    \"message\": {\n" +
-                "        \"data\": \"{'title':'旅兔通知','body':'"+user.getUserName()+" 关注了你','messageTag':'follow','tagUserId':'"+targetUser.getUserId()+"'}\",\n" +
-                "        \"token\": ["+ tokens +"]\n" +
+                "        \"data\": \"{'title':'旅兔通知','body':'" + user.getUserName() + " 关注了你','messageTag':'follow','tagUserId':'" + targetUser.getUserId() + "'}\",\n" +
+                "        \"token\": [" + tokens + "]\n" +
                 "    }\n" +
                 "}";
         try {
@@ -108,6 +109,7 @@ public class UserRelationshipServiceImpl extends ServiceImpl<UserRelationshipMap
             throw new RuntimeException(e);
         }
     }
+
     // 查找一条关系记录
     @Override
     public UserRelationship findRelationship(String userId, String relatedUserId) {

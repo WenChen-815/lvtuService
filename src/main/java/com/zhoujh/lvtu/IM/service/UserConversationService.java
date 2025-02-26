@@ -8,4 +8,8 @@ import java.util.List;
 public interface UserConversationService extends IService<UserConversation> {
     UserConversation getByConversationIdAndUserId(String conversationId, String userId);
     List<UserConversation> getByUserId(String userId);
+
+    UserConversation addOne(UserConversation userConversation);
+
+    void removeOne(UserConversation userConversation);
 }

@@ -1,15 +1,18 @@
 package com.zhoujh.lvtu.post.serviceImpl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.zhoujh.lvtu.common.model.UserRelationship;
 import com.zhoujh.lvtu.post.mapper.PostMapper;
 import com.zhoujh.lvtu.post.model.Post;
+import com.zhoujh.lvtu.post.model.TravelPlan;
 import com.zhoujh.lvtu.post.service.PostService;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -25,7 +28,7 @@ public class PostServiceImpl extends ServiceImpl<PostMapper, Post> implements Po
         post.setCreateTime(LocalDateTime.now());
         post.setUpdateTime(LocalDateTime.now());
         boolean success = save(post); // 使用 Mybatis-Plus 提供的 save() 方法保存数据
-        return success? post : null;
+        return success ? post : null;
     }
 
     @Override
@@ -46,14 +49,31 @@ public class PostServiceImpl extends ServiceImpl<PostMapper, Post> implements Po
 
     @Override
     public Page<Post> getFollowPosts(int pageNum, int pageSize, List<UserRelationship> userRelationships) {
-        Page<Post> page = new Page<>(pageNum, pageSize);
+        List<Post> allPosts = new ArrayList<>();
         for (UserRelationship userRelationship : userRelationships) {
             LambdaQueryWrapper<Post> queryWrapper = new LambdaQueryWrapper<>();
             queryWrapper.eq(Post::getUserId, userRelationship.getRelatedUserId());
             queryWrapper.orderByDesc(Post::getCreateTime); // 按创建时间倒序排序
-            this.page(page, queryWrapper);
+
+            IPage<Post> tempPage = new Page<>(1, Integer.MAX_VALUE); // 获取所有结果
+            this.page(tempPage, queryWrapper);
+            allPosts.addAll(tempPage.getRecords());
         }
-        return page;
+
+        // 对所有结果进行排序
+        allPosts.sort((tp1, tp2) -> tp2.getUpdateTime().compareTo(tp1.getUpdateTime()));
+
+        // 计算分页
+        int total = allPosts.size();
+        int start = (pageNum - 1) * pageSize;
+        int end = Math.min(start + pageSize, total);
+
+        List<Post> currentPageRecords = allPosts.subList(start, end);
+
+        // 构建返回的 Page 对象
+        Page<Post> resultPage = new Page<>(pageNum, pageSize, total);
+        resultPage.setRecords(currentPageRecords);
+        return resultPage;
     }
 
     @Override
@@ -66,9 +86,7 @@ public class PostServiceImpl extends ServiceImpl<PostMapper, Post> implements Po
     public boolean deletePost(String postId) {
         Post post = getPostById(postId);
         if (post != null) {
-            post.setStatus(2); // 设置为已删除状态
-            post.setUpdateTime(LocalDateTime.now()); // 设置修改时间
-            return updateById(post); // 更新数据库
+            return removeById(postId);
         }
         return false;
     }
@@ -76,5 +94,48 @@ public class PostServiceImpl extends ServiceImpl<PostMapper, Post> implements Po
     @Override
     public List<Post> getPostsByUserId(String userId) {
         return baseMapper.selectList(new LambdaQueryWrapper<Post>().eq(Post::getUserId, userId));
+    }
+
+    @Override
+    public void commentIncrease(String postId) {
+        Post post = getPostById(postId);
+        if (post != null) {
+            post.setCommentCount(post.getCommentCount() + 1);
+            updateById(post);
+        }
+    }
+
+    @Override
+    public boolean likePost(String postId, String userId) {
+        Post post = getPostById(postId);
+        if (post != null) {
+            post.setLikeCount(post.getLikeCount() + 1);
+            updateById(post);
+            return true;
+        }
+        return false;
+    }
+
+    @Override
+    public boolean unlikePost(String postId, String userId) {
+        Post post = getPostById(postId);
+        if (post != null) {
+            post.setLikeCount(post.getLikeCount() - 1);
+            updateById(post);
+            return true;
+        }
+        return false;
+    }
+
+    @Override
+    public Page<Post> getMyPosts(int pageNum, int pageSize, String userId) {
+        // 创建分页对象
+        Page<Post> page = new Page<>(pageNum, pageSize);
+
+        LambdaQueryWrapper<Post> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.eq(Post::getUserId, userId)
+                .orderByDesc(Post::getCreateTime); // 按创建时间倒序排序
+        // 执行分页查询
+        return this.page(page, queryWrapper);
     }
 }

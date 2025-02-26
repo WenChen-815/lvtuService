@@ -23,7 +23,7 @@ public class Post implements Serializable {
     @TableField(typeHandler = StringListHandler.class)
     private List<String> picturePath; // 帖子图片路径, MyBatis Plus 会自动将 List<String> 转换为 JSON 格式并存储到 JSON 类型的列中,只需要确保实体类的字段和数据库中的列类型匹配。
     private int pictureCount; // 图片数量
-    private int status; // 帖子状态 (1: 发布, 0: 草稿, 2: 已删除)
+    private int status; // 帖子状态 (0: 草稿, 1: 发布)
     @TableField(typeHandler = StringListHandler.class)
     private List<String> tags; // 标签列表
     private int likeCount; // 点赞数

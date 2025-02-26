@@ -48,4 +48,28 @@ public class UserConversationController {
        }
        return userConversationList;
     }
+
+    @PostMapping("/createGroupChat")
+    public List<UserConversation> createGroupChat(@RequestBody UserConversation userConversation) {
+        List<UserConversation> userConversationList = new ArrayList<>();
+        for (int i = 0; i < userConversation.getMembers().size(); i++){
+            String member = userConversation.getMembers().get(i);
+            UserConversation isExist = userConversationServiceImpl.getByConversationIdAndUserId(userConversation.getConversationId(),member);
+            if (isExist == null){
+                UserConversation conversation = new UserConversation();
+                conversation.setUserId(member);
+                conversation.setGroupName(userConversation.getGroupName());
+                conversation.setConversationId(userConversation.getConversationId());
+                conversation.setConversationType(userConversation.getConversationType());
+                List<String> members = new ArrayList<>(userConversation.getMembers());
+                members.remove(member);
+                conversation.setMembers(members);
+                userConversationServiceImpl.save(conversation);
+                userConversationList.add(conversation);
+            } else {
+                userConversationList.add(isExist);
+            }
+        }
+        return userConversationList;
+    }
 }

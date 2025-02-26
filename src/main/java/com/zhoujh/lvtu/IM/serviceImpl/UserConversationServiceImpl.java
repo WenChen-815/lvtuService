@@ -81,4 +81,25 @@ public class UserConversationServiceImpl extends ServiceImpl<UserConversationMap
         }
         return userConversationList;
     }
+
+    @Override
+    public UserConversation addOne(UserConversation userConversation) {
+        userConversationMapper.insert(userConversation);
+        List<UserConversation> userConversationList = userConversationMapper.getByConversationId(userConversation.getConversationId());
+        for (UserConversation userConversation1 : userConversationList){
+            userConversation1.getMembers().add(userConversation.getUserId());
+            userConversationMapper.updateById(userConversation1);
+        }
+        return userConversationMapper.getByConversationIdAndUserId(userConversation.getConversationId(),userConversation.getUserId());
+    }
+
+    @Override
+    public void removeOne(UserConversation userConversation) {
+        userConversationMapper.deleteById(userConversation);
+        List<UserConversation> userConversationList = userConversationMapper.getByConversationId(userConversation.getConversationId());
+        for (UserConversation userConversation1 : userConversationList){
+            userConversation1.getMembers().remove(userConversation.getUserId());
+            userConversationMapper.updateById(userConversation1);
+        }
+    }
 }

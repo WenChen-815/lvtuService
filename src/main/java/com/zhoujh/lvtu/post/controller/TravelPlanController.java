@@ -1,6 +1,9 @@
 package com.zhoujh.lvtu.post.controller;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.google.gson.Gson;
+import com.zhoujh.lvtu.IM.modle.UserConversation;
+import com.zhoujh.lvtu.IM.serviceImpl.UserConversationServiceImpl;
 import com.zhoujh.lvtu.common.model.User;
 import com.zhoujh.lvtu.common.model.UserInfo;
 import com.zhoujh.lvtu.common.model.UserRelationship;
@@ -42,6 +45,9 @@ public class TravelPlanController {
     private HuaweiPushService huaweiPushService;
     @Autowired
     private UserRelationshipServiceImpl userRelationshipServiceImpl;
+    @Autowired
+    private UserConversationServiceImpl userConversationServiceImpl;
+    private Gson gson = new Gson();
     @Value("${spring.resources.static-locations}")
     private String staticPath;
 
@@ -131,7 +137,15 @@ public class TravelPlanController {
             @RequestParam String userId
     ) {
         List<UserRelationship> userRelationships = userRelationshipServiceImpl.getFollowList(userId);
+        System.out.println(userRelationships);
         return travelPlanServiceImpl.getFollowPlans(pageNum, pageSize, userRelationships);
+    }
+
+    @GetMapping("/getMyPlans")
+    public Page<TravelPlan> getMyPlans(@RequestParam(defaultValue = "1") int pageNum,
+                                       @RequestParam(defaultValue = "10") int pageSize,
+                                       @RequestParam String userId){
+        return travelPlanServiceImpl.getMyPlans(pageNum, pageSize, userId);
     }
 
     @GetMapping("/getPlanById")
@@ -145,7 +159,7 @@ public class TravelPlanController {
     }
 
     @PostMapping("/addParticipants")
-    public String addParticipants(@RequestParam String travelPlanId, @RequestParam String userId, @RequestParam String creatorId) {
+    public String addParticipants(@RequestParam String travelPlanId, @RequestParam String userId, @RequestParam String creatorId ,@RequestParam String userConversationJson) {
         TravelPlan travelPlan = travelPlanServiceImpl.getById(travelPlanId);
         if (travelPlan == null) {
             return "fail";
@@ -170,13 +184,16 @@ public class TravelPlanController {
                 "        \"token\": ["+ tokens +"]\n" +
                 "    }\n" +
                 "}";
-        System.out.println(json);
         try {
             huaweiPushService.sendPushMessage(json);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
         if (isSuccess1 && isSuccess2){
+            if(travelPlan.getConversationId()!=null && !travelPlan.getConversationId().equals("")){
+                UserConversation userConversation = gson.fromJson(userConversationJson, UserConversation.class);
+                userConversationServiceImpl.addOne(userConversation);
+            }
             return "success";
         } else {
             return "fail";
@@ -209,6 +226,10 @@ public class TravelPlanController {
         boolean isSuccess1 = planParticipantServiceImpl.deleteByPlanIdAndUserId(travelPlanId, userId);
         boolean isSuccess2 =travelPlanServiceImpl.updateById(travelPlan);
         if (isSuccess1 && isSuccess2){
+            if(travelPlan.getConversationId()!=null && !travelPlan.getConversationId().equals("")){
+                UserConversation userConversation = userConversationServiceImpl.getByConversationIdAndUserId(travelPlan.getConversationId(), userId);
+                userConversationServiceImpl.removeOne(userConversation);
+            }
             return "success";
         } else {
             return "fail";
@@ -224,5 +245,10 @@ public class TravelPlanController {
             userInfos.add(userInfo);
         }
         return userInfos;
+    }
+
+    @PostMapping("/createPlanGroup")
+    public TravelPlan createPlanGroup(@RequestParam String travelPlanId, @RequestParam String groupId) {
+        return travelPlanServiceImpl.createPlanGroup(travelPlanId, groupId);
     }
 }

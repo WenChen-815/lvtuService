@@ -1,9 +1,12 @@
 package com.zhoujh.lvtu.post.controller;
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.zhoujh.lvtu.common.model.UserRelationship;
 import com.zhoujh.lvtu.common.serviceImpl.UserRelationshipServiceImpl;
 import com.zhoujh.lvtu.post.model.Post;
+import com.zhoujh.lvtu.post.model.PostLike;
+import com.zhoujh.lvtu.post.serviceImpl.PostLikeServiceImpl;
 import com.zhoujh.lvtu.post.serviceImpl.PostServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.FileCopyUtils;
@@ -27,6 +30,8 @@ public class PostController {
     private PostServiceImpl postServiceImpl;
     @Autowired
     private UserRelationshipServiceImpl userRelationshipServiceImpl;
+    @Autowired
+    private PostLikeServiceImpl postLikeServiceImpl;
 
     private final String uploadDirectory = "D:/lvtu/post/";
 
@@ -41,6 +46,12 @@ public class PostController {
                                      @RequestParam String userId) {
         List<UserRelationship> userRelationships = userRelationshipServiceImpl.getFollowList(userId);
         return postServiceImpl.getFollowPosts(pageNum, pageSize, userRelationships);
+    }
+    @GetMapping("/getMyPosts")
+    public Page<Post> getMyPosts(@RequestParam(defaultValue = "1") int pageNum,
+                                     @RequestParam(defaultValue = "10") int pageSize,
+                                     @RequestParam String userId) {
+        return postServiceImpl.getMyPosts(pageNum, pageSize, userId);
     }
 
     @GetMapping("/getPostsByUserId")
@@ -107,5 +118,27 @@ public class PostController {
             post.setPicturePath(fileNames);
         }
         return postServiceImpl.createPost(post);
+    }
+
+    @GetMapping("/likePost")
+    public PostLike likePost(@RequestParam String postId, @RequestParam String userId) {
+        postServiceImpl.likePost(postId, userId);
+        return postLikeServiceImpl.likePost(postId, userId);
+    }
+
+    @GetMapping("/unlikePost")
+    public boolean unlikePost(@RequestParam String postId, @RequestParam String userId) {
+        return postServiceImpl.unlikePost(postId, userId) && postLikeServiceImpl.unlikePost(postId, userId);
+    }
+
+    @GetMapping("/delete")
+    public boolean deletePost(@RequestParam String postId) {
+        postLikeServiceImpl.remove(new QueryWrapper<PostLike>().eq("post_id", postId));
+        return postServiceImpl.deletePost(postId);
+    }
+
+    @GetMapping("/isLikePost")
+    public PostLike isLikePost(@RequestParam String postId, @RequestParam String userId) {
+        return postLikeServiceImpl.isLikePost(postId, userId);
     }
 }

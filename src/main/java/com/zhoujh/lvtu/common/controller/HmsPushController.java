@@ -1,5 +1,7 @@
 package com.zhoujh.lvtu.common.controller;
 
+import com.zhoujh.lvtu.IM.modle.UserConversation;
+import com.zhoujh.lvtu.IM.serviceImpl.UserConversationServiceImpl;
 import com.zhoujh.lvtu.common.model.ClientPush;
 import com.zhoujh.lvtu.common.serviceImpl.HmsPushTokenServiceImpl;
 import com.zhoujh.lvtu.utils.HuaweiPushService;
@@ -18,6 +20,8 @@ public class HmsPushController {
     private final HmsPushTokenServiceImpl tokenServiceImpl;
     @Autowired
     private final HuaweiPushService huaweiPushService;
+    @Autowired
+    private final UserConversationServiceImpl userConversationServiceImpl;
     // 注册/更新Token
     @PostMapping("/register")
     public String registerToken(@RequestParam String userId,
@@ -40,7 +44,7 @@ public class HmsPushController {
         return result ? "删除成功" : "删除失败";
     }
 
-    @PostMapping("/clientPush")
+    @PostMapping("/clientMsgPush")
     public String pushRequest(@RequestBody ClientPush clientPush) {
         String tokens = tokenServiceImpl.createTokens(clientPush.getTargetId());
         String json = "{\n" +
@@ -57,6 +61,31 @@ public class HmsPushController {
             huaweiPushService.sendPushMessage(json);
         } catch (IOException e) {
             throw new RuntimeException(e);
+        }
+        return "推送成功";
+    }
+
+    @PostMapping("/clientGroupMsgPush")
+    public String clientGroupMsgPush(@RequestBody ClientPush clientPush) {
+        UserConversation userConversation = userConversationServiceImpl.getByConversationIdAndUserId(clientPush.getTargetId(), clientPush.getPusherId());
+        for(String s: userConversation.getMembers()){
+            String tokens = tokenServiceImpl.createTokens(s);
+            String json = "{\n" +
+                    "    \"validate_only\": false,\n" +
+                    "    \"message\": {\n" +
+                    "        \"data\": \"{'title':'"+clientPush.getTitle()+"'," +
+                    "'body':'"+clientPush.getBody()+"'," +
+                    "'messageTag':'IM'," +
+                    "'tagUserId':'"+ s +"'}\",\n" +
+                    "        \"token\": ["+ tokens +"]\n" +
+                    "    }\n" +
+                    "}";
+            System.out.println(json);
+            try {
+                huaweiPushService.sendPushMessage(json);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
         }
         return "推送成功";
     }
