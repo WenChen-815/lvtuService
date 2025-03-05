@@ -11,5 +11,7 @@ public interface CommentService extends IService<Comment> {
     List<Comment> getCommentsByPostId(String postId);
 
     Comment addComment(Comment comment);
+
+    int deleteByPostId(String postId);
 }
 

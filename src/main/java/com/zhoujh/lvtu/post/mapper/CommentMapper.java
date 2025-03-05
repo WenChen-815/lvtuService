@@ -2,6 +2,7 @@ package com.zhoujh.lvtu.post.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.zhoujh.lvtu.post.model.Comment;
+import org.apache.ibatis.annotations.Delete;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Select;
 
@@ -16,5 +17,8 @@ public interface CommentMapper extends BaseMapper<Comment> {
             "(id, post_id, parent_id, user_id, reply_to_user_id, content, create_time, user_name, reply_to_user_name) " +
             "VALUES (#{id}, #{postId}, #{parentId}, #{userId}, #{replyToUserId}, #{content}, #{createTime}, #{userName}, #{replyToUserName})")
     Comment addComment(Comment comment);
+
+    @Delete("DELETE FROM comments WHERE post_id = #{postId}")
+    int deleteByPostId(String postId);
 }
 

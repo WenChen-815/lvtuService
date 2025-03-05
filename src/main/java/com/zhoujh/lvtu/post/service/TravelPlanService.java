@@ -20,4 +20,6 @@ public interface TravelPlanService extends IService<TravelPlan> {
     TravelPlan createPlanGroup(String travelPlanId, String userId);
 
     Page<TravelPlan> getMyPlans(int pageNum, int pageSize, String userId);
+
+    Page<TravelPlan> searchPlansByTitle(String titleStr, int pageNum, int pageSize);
 }

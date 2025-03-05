@@ -12,4 +12,8 @@ public interface UserConversationService extends IService<UserConversation> {
     UserConversation addOne(UserConversation userConversation);
 
     void removeOne(UserConversation userConversation);
+
+    int deleteByConversationId(String conversationId);
+
+    List<UserConversation> getByConversationId(String groupId);
 }

@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.zhoujh.lvtu.common.model.UserRelationship;
+import com.zhoujh.lvtu.post.model.Post;
 import com.zhoujh.lvtu.post.model.TravelPlan;
 import com.zhoujh.lvtu.post.mapper.TravelPlanMapper;
 import com.zhoujh.lvtu.post.service.TravelPlanService;
@@ -86,4 +87,14 @@ public class TravelPlanServiceImpl extends ServiceImpl<TravelPlanMapper, TravelP
         return this.page(page, queryWrapper);
     }
 
+
+    @Override
+    public Page<TravelPlan> searchPlansByTitle(String titleStr, int pageNum, int pageSize) {
+        Page<TravelPlan> page = new Page<>(pageNum, pageSize);
+
+        LambdaQueryWrapper<TravelPlan> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.like(TravelPlan::getTitle, titleStr)
+                .orderByDesc(TravelPlan::getCreateTime);
+        return this.page(page, queryWrapper);
+    }
 }

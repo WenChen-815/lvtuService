@@ -138,4 +138,14 @@ public class PostServiceImpl extends ServiceImpl<PostMapper, Post> implements Po
         // 执行分页查询
         return this.page(page, queryWrapper);
     }
+
+    @Override
+    public Page<Post> searchPostsByTitle(String titleStr, int pageNum, int pageSize) {
+        Page<Post> page = new Page<>(pageNum, pageSize);
+
+        LambdaQueryWrapper<Post> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.like(Post::getPostTitle, titleStr)
+                .orderByDesc(Post::getCreateTime);
+        return this.page(page, queryWrapper);
+    }
 }

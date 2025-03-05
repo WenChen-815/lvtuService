@@ -7,6 +7,8 @@ import com.zhoujh.lvtu.common.model.UserInfo;
 import org.springframework.stereotype.Repository;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.List;
+
 @Repository
 public interface UserService extends IService<User> {
     User registerAndLogin(User user);  // 用户登录注册

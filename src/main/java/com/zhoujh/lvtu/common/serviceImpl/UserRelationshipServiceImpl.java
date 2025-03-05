@@ -130,5 +130,11 @@ public class UserRelationshipServiceImpl extends ServiceImpl<UserRelationshipMap
                 .list();
     }
 
-
+    @Override
+    public List<UserRelationship> getMutualFollowUser(String userId) {
+        return this.lambdaQuery()
+                .eq(UserRelationship::getUserId, userId)
+                .eq(UserRelationship::getRelationshipType, this.FOLLOW_EACH_OTHER)
+                .list();
+    }
 }

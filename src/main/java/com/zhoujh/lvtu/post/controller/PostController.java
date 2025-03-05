@@ -6,6 +6,7 @@ import com.zhoujh.lvtu.common.model.UserRelationship;
 import com.zhoujh.lvtu.common.serviceImpl.UserRelationshipServiceImpl;
 import com.zhoujh.lvtu.post.model.Post;
 import com.zhoujh.lvtu.post.model.PostLike;
+import com.zhoujh.lvtu.post.serviceImpl.CommentServiceImpl;
 import com.zhoujh.lvtu.post.serviceImpl.PostLikeServiceImpl;
 import com.zhoujh.lvtu.post.serviceImpl.PostServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,6 +33,8 @@ public class PostController {
     private UserRelationshipServiceImpl userRelationshipServiceImpl;
     @Autowired
     private PostLikeServiceImpl postLikeServiceImpl;
+    @Autowired
+    private CommentServiceImpl commentServiceImpl;
 
     private final String uploadDirectory = "D:/lvtu/post/";
 
@@ -134,11 +137,26 @@ public class PostController {
     @GetMapping("/delete")
     public boolean deletePost(@RequestParam String postId) {
         postLikeServiceImpl.remove(new QueryWrapper<PostLike>().eq("post_id", postId));
+        commentServiceImpl.deleteByPostId(postId);
         return postServiceImpl.deletePost(postId);
     }
 
     @GetMapping("/isLikePost")
     public PostLike isLikePost(@RequestParam String postId, @RequestParam String userId) {
         return postLikeServiceImpl.isLikePost(postId, userId);
+    }
+
+    /**
+     * 根据帖子标题模糊搜索帖子
+     * @param titleStr 帖子标题关键字
+     * @param pageNum 当前页码
+     * @param pageSize 每页大小
+     * @return 分页查询结果
+     */
+    @GetMapping("/search")
+    public Page<Post> searchPostsByTitle(@RequestParam String titleStr,
+                                         @RequestParam(defaultValue = "1") int pageNum,
+                                         @RequestParam(defaultValue = "10") int pageSize) {
+        return postServiceImpl.searchPostsByTitle(titleStr, pageNum, pageSize);
     }
 }

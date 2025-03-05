@@ -3,16 +3,23 @@ package com.zhoujh.lvtu.common.controller;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.zhoujh.lvtu.common.model.User;
 import com.zhoujh.lvtu.common.model.UserInfo;
+import com.zhoujh.lvtu.common.model.UserRelationship;
+import com.zhoujh.lvtu.common.serviceImpl.UserRelationshipServiceImpl;
 import com.zhoujh.lvtu.common.serviceImpl.UserServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/user")
 public class UserController {
     @Autowired
     private UserServiceImpl userServiceImpl;
+    @Autowired
+    private UserRelationshipServiceImpl userRelationshipServiceImpl;
 
     @GetMapping("/user")
     public User getUser(@RequestParam String userId) {
@@ -56,5 +63,22 @@ public class UserController {
                                  @RequestParam String birth) {
         User updateUser = userServiceImpl.updateUserInfo(file, userName, userId, gender, email, birth);
         return updateUser;
+    }
+
+    @GetMapping("/getMutualFollowUser")
+    public List<UserInfo> getMutualFollowUser(@RequestParam String userId) {
+        List<UserRelationship> userRelationships = userRelationshipServiceImpl.getMutualFollowUser(userId);
+        return userRelationships.stream().map(userRelationship -> {
+            User user = userServiceImpl.getById(userRelationship.getRelatedUserId());
+            return new UserInfo(
+                    user.getUserId(),
+                    user.getUserName(),
+                    user.getStatus(),
+                    user.getGender(),
+                    user.getAge(),
+                    user.getBirth(),
+                    user.getAvatarUrl(),
+                    userRelationship.getRelationshipType());
+        }).collect(Collectors.toList());
     }
 }

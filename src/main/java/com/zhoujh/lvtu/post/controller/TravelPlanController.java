@@ -212,6 +212,9 @@ public class TravelPlanController {
         if (travelPlan == null) {
             return "fail";
         }
+        if (travelPlan.getConversationId() != null && !travelPlan.getConversationId().equals("")) {
+            userConversationServiceImpl.deleteByConversationId(travelPlan.getConversationId());
+        }
         travelPlan.setStatus(3);
         boolean isSuccess = travelPlanServiceImpl.updateById(travelPlan);
         return isSuccess ? "success" : "fail";
@@ -250,5 +253,19 @@ public class TravelPlanController {
     @PostMapping("/createPlanGroup")
     public TravelPlan createPlanGroup(@RequestParam String travelPlanId, @RequestParam String groupId) {
         return travelPlanServiceImpl.createPlanGroup(travelPlanId, groupId);
+    }
+
+    /**
+     * 根据行程标题模糊搜索行程
+     * @param titleStr 行程标题关键字
+     * @param pageNum 当前页码
+     * @param pageSize 每页大小
+     * @return 分页查询结果
+     */
+    @GetMapping("/search")
+    public Page<TravelPlan> searchPlansByTitle(@RequestParam String titleStr,
+                                               @RequestParam(defaultValue = "1") int pageNum,
+                                               @RequestParam(defaultValue = "10") int pageSize) {
+        return travelPlanServiceImpl.searchPlansByTitle(titleStr, pageNum, pageSize);
     }
 }

@@ -26,5 +26,10 @@ public class CommentServiceImpl extends ServiceImpl<CommentMapper, Comment> impl
         comment.setId(UUID.randomUUID().toString());
         return commentMapper.insert(comment) > 0 ? comment: null;
     }
+
+    @Override
+    public int deleteByPostId(String postId) {
+        return commentMapper.deleteByPostId(postId);
+    }
 }
 

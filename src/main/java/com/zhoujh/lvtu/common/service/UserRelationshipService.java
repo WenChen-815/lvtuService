@@ -31,4 +31,5 @@ public interface UserRelationshipService extends IService<UserRelationship> {
     // 获取用户关注列表
     List<UserRelationship> getFollowList(String userId);
 
+    List<UserRelationship> getMutualFollowUser(String userId);
 }

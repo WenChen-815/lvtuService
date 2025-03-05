@@ -102,4 +102,16 @@ public class UserConversationServiceImpl extends ServiceImpl<UserConversationMap
             userConversationMapper.updateById(userConversation1);
         }
     }
+
+    @Override
+    public int deleteByConversationId(String conversationId) {
+        return userConversationMapper.deleteByConversationId(conversationId);
+    }
+
+    @Override
+    public List<UserConversation> getByConversationId(String groupId) {
+        return this.lambdaQuery()
+                .eq(UserConversation::getConversationId, groupId)
+                .list();
+    }
 }

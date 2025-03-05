@@ -27,4 +27,6 @@ public interface PostService extends IService<Post> {
     boolean unlikePost(String postId, String userId);
 
     Page<Post> getMyPosts(int pageNum, int pageSize, String userId);
+
+    Page<Post> searchPostsByTitle(String titleStr, int pageNum, int pageSize);
 }

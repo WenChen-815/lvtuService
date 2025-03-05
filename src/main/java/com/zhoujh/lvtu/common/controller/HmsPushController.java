@@ -69,22 +69,24 @@ public class HmsPushController {
     public String clientGroupMsgPush(@RequestBody ClientPush clientPush) {
         UserConversation userConversation = userConversationServiceImpl.getByConversationIdAndUserId(clientPush.getTargetId(), clientPush.getPusherId());
         for(String s: userConversation.getMembers()){
-            String tokens = tokenServiceImpl.createTokens(s);
-            String json = "{\n" +
-                    "    \"validate_only\": false,\n" +
-                    "    \"message\": {\n" +
-                    "        \"data\": \"{'title':'"+clientPush.getTitle()+"'," +
-                    "'body':'"+clientPush.getBody()+"'," +
-                    "'messageTag':'IM'," +
-                    "'tagUserId':'"+ s +"'}\",\n" +
-                    "        \"token\": ["+ tokens +"]\n" +
-                    "    }\n" +
-                    "}";
-            System.out.println(json);
-            try {
-                huaweiPushService.sendPushMessage(json);
-            } catch (IOException e) {
-                throw new RuntimeException(e);
+            if (!s.equals(clientPush.getPusherId())){
+                String tokens = tokenServiceImpl.createTokens(s);
+                String json = "{\n" +
+                        "    \"validate_only\": false,\n" +
+                        "    \"message\": {\n" +
+                        "        \"data\": \"{'title':'"+clientPush.getTitle()+"'," +
+                        "'body':'"+clientPush.getBody()+"'," +
+                        "'messageTag':'IM'," +
+                        "'tagUserId':'"+ s +"'}\",\n" +
+                        "        \"token\": ["+ tokens +"]\n" +
+                        "    }\n" +
+                        "}";
+                System.out.println(json);
+                try {
+                    huaweiPushService.sendPushMessage(json);
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
             }
         }
         return "推送成功";
